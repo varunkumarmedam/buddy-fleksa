@@ -3,6 +3,11 @@ import Image from 'next/image'
 import Card from '../components/Card'
 import Cart from '../components/Cart'
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
+
+const Bomb = dynamic(() => import('../components/Bomb'), {
+  ssr: false,
+})
 // import 'bootstrap/dist/css/bootstrap.css';
 
 export default function Home() {
@@ -3895,8 +3900,16 @@ export default function Home() {
     }
   ])
   const [cartItems, setCartItems] = useState([])
+  const [bombType, setBombType] = useState({
+    type: '',
+  })
 
   function addItemToCart(item) {
+    // Call confetti if its first time added to cart
+    if (cartItems.length == 0)
+      setBombType({
+        type: 'cannon',
+      })
     if (cartItems.findIndex(cItem => cItem.id == item.id) == -1) {
       const cartItem = {}
       cartItem.id = item.id;
@@ -3942,6 +3955,7 @@ export default function Home() {
   return (
     <div className='container'>
       <div className='row'>
+        <Bomb type={bombType} />
         <div className='col-sm-12 col-md-8'>
           {items.map((category, index) => {
             return (
@@ -3969,7 +3983,7 @@ export default function Home() {
           })}
         </div>
         <div className="col-sm-12 col-md-4">
-          <Cart items={cartItems} />
+          <Cart items={cartItems} add={addItemToCart} remove={removeItemFromCart}/>
         </div>
       </div>
     </div>
